@@ -1,14 +1,14 @@
-const express = require('express');
+const express = require("express");
 const app = express();
 app.use(express.json());
 const {
 	models: { User, Note },
-} = require('./db');
-const path = require('path');
+} = require("./db");
+const path = require("path");
 
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+app.get("/", (req, res) => res.sendFile(path.join(__dirname, "index.html")));
 
-app.post('/api/auth', async (req, res, next) => {
+app.post("/api/auth", async (req, res, next) => {
 	try {
 		//console.log('token is defined');
 		res.send({ token: await User.authenticate(req.body) });
@@ -17,17 +17,19 @@ app.post('/api/auth', async (req, res, next) => {
 	}
 });
 
-app.get('/api/auth', async (req, res, next) => {
+app.get("/api/auth", async (req, res, next) => {
 	try {
+		console.log("req.headers.authorization", req.headers.authorization);
 		const token = await User.byToken(req.headers.authorization);
 		// console.log("token", token);
+		// const userId=
 		res.send(token);
 	} catch (ex) {
 		next(ex);
 	}
 });
 //api/auth/:userId/notes
-app.get('/api/auth/:userId/notes', async (req, res, next) => {
+app.get("/api/auth/:userId/notes", async (req, res, next) => {
 	try {
 		const notes = await Note.findAll({
 			where: { userId: req.params.userId },
