@@ -1,13 +1,7 @@
 <html>
 	<head>
-		<script
-			src="https://unpkg.com/react@17/umd/react.development.js"
-			crossorigin
-		></script>
-		<script
-			src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"
-			crossorigin
-		></script>
+		<script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
+		<script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
 		<script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
 		<script
 			src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"
@@ -22,8 +16,8 @@
 				constructor() {
 					super();
 					this.state = {
-						username: "",
-						password: "",
+						username: '',
+						password: '',
 					};
 					this.onChange = this.onChange.bind(this);
 					this.onSubmit = this.onSubmit.bind(this);
@@ -57,50 +51,74 @@
 					super();
 					this.state = {
 						auth: {},
+						notes: [],
 					};
 					this.signIn = this.signIn.bind(this);
 					this.logout = this.logout.bind(this);
+					this.attemptTokenLogin = this.attemptTokenLogin.bind(this);
 				}
 				logout() {
-					window.localStorage.removeItem("token");
+					window.localStorage.removeItem('token');
 					this.setState({ auth: {} });
 				}
 				async attemptTokenLogin() {
-					const token = window.localStorage.getItem("token");
+					const token = window.localStorage.getItem('token');
 					if (token) {
-						const response = await axios.get("/api/auth", {
+						const response = await axios.get('/api/auth', {
 							headers: {
 								authorization: token,
 							},
 						});
 						this.setState({ auth: response.data });
+						//console.log(this.state);
+						//check another property that will not be undefined after loading
+						if (this.state.auth.id) {
+							const { data } = await axios.get(`/api/auth/${this.state.auth.id}/notes`);
+							//data = response.data
+							this.setState({ notes: data });
+						}
 					}
 				}
 				componentDidMount() {
 					this.attemptTokenLogin();
 				}
+
 				async signIn(credentials) {
-					let response = await axios.post("/api/auth", credentials);
+					let response = await axios.post('/api/auth', credentials);
 					const { token } = response.data;
-					window.localStorage.setItem("token", token);
+					window.localStorage.setItem('token', token);
 					this.attemptTokenLogin();
 				}
 				render() {
+					console.log(this.state);
 					const { auth } = this.state;
 					const { signIn, logout } = this;
 					if (!auth.id) {
 						return <SignIn signIn={signIn} />;
-					} else {
+					}
+					if (!this.state.notes) return 'There are no notes';
+					else {
 						return (
 							<div>
 								Welcome {auth.username}
 								<button onClick={logout}>Logout</button>
+								<div>
+									{this.state.notes.map((note, idx) => {
+										return (
+											<div>
+												<li key={idx}>
+													<div>{note}</div>
+												</li>
+											</div>
+										);
+									})}
+								</div>
 							</div>
 						);
 					}
 				}
 			}
-			ReactDOM.render(<App />, document.querySelector("#root"));
+			ReactDOM.render(<App />, document.querySelector('#root'));
 		</script>
 	</body>
 </html>
