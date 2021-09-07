@@ -1,0 +1,22 @@
+{
+	"name": "acme_auth",
+	"version": "1.0.0",
+	"description": "",
+	"main": "app.js",
+	"scripts": {
+		"start:dev": "JWT=jpfp2021 nodemon server",
+		"start-server": "nodemon main.js -e html,js,css --ignore public",
+		"build-watch": "webpack -w",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"express": "^4.17.1",
+		"jsonwebtoken": "^8.5.1",
+		"nodemon": "^2.0.12",
+		"pg": "^8.7.1",
+		"sequelize": "^6.6.5"
+	}
+}
